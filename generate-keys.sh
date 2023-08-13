@@ -1,9 +1,16 @@
 #!/usr/bin/env sh
 
-mnemonic=$(eth2-val-tools mnemonic)
+if [ "$MNEMONIC" = "" ]; then
+  MNEMONIC=$(eth2-val-tools mnemonic)
 
-echo "Mnemonic: $mnemonic"
-eth2-val-tools pubkeys \
-  --validators-mnemonic="$mnemonic" \
-  --source-min=$START_INDEX \
-  --source-max=$END_INDEX
+  echo "Mnemonic: $MNEMONIC"
+fi
+
+eth2-val-tools deposit-data \
+  --source-min $START_INDEX \
+  --source-max $END_INDEX \
+  --validators-mnemonic "$MNEMONIC" \
+  --withdrawals-mnemonic "$MNEMONIC" \
+  --as-json-list \
+  --fork-version 0x00000000 | \
+  jq ".[] | \"0x\" + .pubkey + \":\" + .withdrawal_credentials" | tr -d '"'

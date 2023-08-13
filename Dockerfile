@@ -1,5 +1,8 @@
 FROM golang
 
+RUN apt-get update && \
+    apt install jq -y
+
 WORKDIR /opt
 
 RUN git clone https://github.com/protolambda/eth2-val-tools.git
